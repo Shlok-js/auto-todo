@@ -28,10 +28,6 @@ variable "vm_size" {
   type        = string
 }
 
-variable "admin_username" {
-  description = "The administrator username for the virtual machine."
-  type        = string
-}
 
 variable "image_publisher" {
   description = "The publisher of the image to use for the virtual machine."
