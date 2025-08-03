@@ -51,37 +51,13 @@ module "public_ip_frontend" {
   allocation_method   = "Static"
 }
 
-module "key_vault" {
-  source              = "../modules/azurerm_key_vault"
-  name                = "bhauvault"
-  location            = module.resource_group.location
-  resource_group_name = module.resource_group.name
-  tenant_id           = data.azurerm_client_config.current.tenant_id
-  object_id           = data.azurerm_client_config.current.object_id
-}
 
-module "key_vault_secret_username" {
-  source              = "../modules/azurerm_key_vault_secret"
-  secret_name         = "vm-username"
-  secret_value        = var.vm_admin_username
-  key_vault_id        = module.key_vault.id
-  manual_dependencies = [module.key_vault]
-}
 
-module "key_vault_secret_password" {
-  source              = "../modules/azurerm_key_vault_secret"
-  secret_name         = "vm-password"
-  secret_value        = var.vm_admin_password
-  key_vault_id        = module.key_vault.id
-  manual_dependencies = [module.key_vault]
-}
+
 
 module "virtual_machine" {
   depends_on = [
     module.backend_subnet,
-    module.key_vault,
-    module.key_vault_secret_username,
-    module.key_vault_secret_password,
     module.public_ip_frontend
   ]
   source               = "../modules/azurerm_virtual_machine"
@@ -89,7 +65,6 @@ module "virtual_machine" {
   location             = "West Europe"
   vm_name              = "vm-bhavastorage"
   vm_size              = "Standard_B1s"
-  admin_username       = "devopsadmin"
   image_publisher      = "Canonical"
   image_offer          = "0001-com-ubuntu-server-focal"
   image_sku            = "20_04-lts"
@@ -98,18 +73,21 @@ module "virtual_machine" {
   frontend_ip_name     = module.public_ip_frontend.public_ip_name
   vnet_name            = module.virtual_network.name
   frontend_subnet_name = module.frontend_subnet.subnet_name
-  key_vault_name       = module.key_vault.name
-  username_secret_name = "vm-username"
-  password_secret_name = "vm-password"
+  admin_username       = var.admin_username
+  admin_password       = var.admin_password
 }
 
-variable "vm_admin_username" {
-  description = "VM admin username"
+variable "admin_username" {
+  description = "The admin username for the virtual machine."
   type        = string
 }
 
-variable "vm_admin_password" {
-  description = "VM admin password"
+variable "admin_password" {
+  description = "The admin password for the virtual machine."
   type        = string
   sensitive   = true
 }
+
+
+ 
+

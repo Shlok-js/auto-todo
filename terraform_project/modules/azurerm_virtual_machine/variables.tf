@@ -1,3 +1,13 @@
+variable "admin_username" {
+  description = "Admin username for the virtual machine"
+  type        = string
+}
+
+variable "admin_password" {
+  description = "Admin password for the virtual machine"
+  type        = string
+  sensitive   = true
+}
 variable "resource_group_name" {
   description = "The name of the resource group in which to create the virtual machine."
   type        = string
@@ -63,6 +73,3 @@ variable "vnet_name" {
   type        = string
 }
 
-variable "key_vault_name" {}
-variable "username_secret_name" {}
-variable "password_secret_name" {}
